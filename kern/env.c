@@ -209,6 +209,7 @@ static int env_setup_vm(struct Env *e) {
 	/* Step 3: Map its own page table at 'UVPT' with readonly permission.
 	 * As a result, user programs can read its page table through 'UVPT' */
 	e->env_pgdir[PDX(UVPT)] = PADDR(e->env_pgdir) | PTE_V;
+	e->env_pgdir[PDX(KSEG0)] = 1;
 	return 0;
 }
 
@@ -275,6 +276,27 @@ int env_alloc(struct Env **new, u_int parent_id) {
 
 	/* Step 5: Remove the new Env from env_free_list. */
 	/* Exercise 3.4: Your code here. (4/4) */
+	LIST_REMOVE(e, env_link);
+	*new = e;
+	return 0;
+}
+
+int env_clone(struct Env **new, u_int parent_id) {
+	struct Env *e;
+	
+	e = LIST_FIRST(&env_free_list);
+	if (!e) {
+		return -E_NO_FREE_ENV; 
+	}
+	
+	e->env_pgdir=envs[ENVX(parent_id)].env_pgdir;
+	e->env_pgdir[PDX(KSEG0)]+=1;
+	e->env_user_tlb_mod_entry = 0;
+	e->env_runs = 0;
+	e->env_id=mkenvid(e);
+	e->env_asid=envs[ENVX(parent_id)].env_asid;
+	e->env_parent_id=parent_id;
+	e->env_tf.cp0_status = STATUS_IM7 | STATUS_IE | STATUS_EXL | STATUS_UM;
 	LIST_REMOVE(e, env_link);
 	*new = e;
 	return 0;
@@ -387,7 +409,8 @@ void env_free(struct Env *e) {
 
 	/* Hint: Note the environment's demise.*/
 	printk("[%08x] free env %08x\n", curenv ? curenv->env_id : 0, e->env_id);
-
+	if (e->env_pgdir[PDX(KSEG0)] == 1)
+	{
 	/* Hint: Flush all mapped pages in the user portion of the address space */
 	for (pdeno = 0; pdeno < PDX(UTOP); pdeno++) {
 		/* Hint: only look at mapped page tables. */
@@ -414,8 +437,11 @@ void env_free(struct Env *e) {
 	page_decref(pa2page(PADDR(e->env_pgdir)));
 	/* Hint: free the ASID */
 	asid_free(e->env_asid);
-	/* Hint: invalidate page directory in TLB */
 	tlb_invalidate(e->env_asid, UVPT + (PDX(UVPT) << PGSHIFT));
+	} else {
+		e->env_pgdir[PDX(KSEG0)]--;
+	}
+/* Hint: invalidate page directory in TLB */
 	/* Hint: return the environment to the free list. */
 	e->env_status = ENV_FREE;
 	LIST_INSERT_HEAD((&env_free_list), (e), env_link);

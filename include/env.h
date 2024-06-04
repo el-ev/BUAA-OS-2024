@@ -54,7 +54,7 @@ void env_destroy(struct Env *e);
 
 int envid2env(u_int envid, struct Env **penv, int checkperm);
 void env_run(struct Env *e) __attribute__((noreturn));
-
+int env_clone(struct Env **e, u_int parent_id);
 void env_check(void);
 void envid2env_check(void);
 
