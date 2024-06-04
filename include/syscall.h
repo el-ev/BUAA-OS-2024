@@ -22,7 +22,11 @@ enum {
 	SYS_cgetc,
 	SYS_write_dev,
 	SYS_read_dev,
-	MAX_SYSNO,
+	SYS_sem_open,
+	SYS_sem_wait,
+	SYS_sem_post,
+	SYS_sem_kill,
+	MAX_SYSNO
 };
 
 #endif
