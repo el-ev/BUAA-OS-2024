@@ -4,6 +4,19 @@
 #include <syscall.h>
 #include <trap.h>
 
+
+int syscall_msg_send(u_int envid, u_int value, const void *srcva, u_int perm) {
+	return msyscall(SYS_msg_send, envid, value, srcva, perm);
+}
+
+int syscall_msg_recv(void *dstva) {
+	return msyscall(SYS_msg_recv, dstva);
+}
+
+int syscall_msg_status(u_int msgid) {
+	return msyscall(SYS_msg_status, msgid);
+}
+
 void syscall_putchar(int ch) {
 	msyscall(SYS_putchar, ch);
 }
