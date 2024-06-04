@@ -1,0 +1,80 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+EI_MAG0	elf.h	81;"	d
+EI_MAG1	elf.h	84;"	d
+EI_MAG2	elf.h	87;"	d
+EI_MAG3	elf.h	90;"	d
+EI_NIDENT	elf.h	58;"	d
+ELFMAG0	elf.h	82;"	d
+ELFMAG1	elf.h	85;"	d
+ELFMAG2	elf.h	88;"	d
+ELFMAG3	elf.h	91;"	d
+Elf32_Addr	elf.h	/^typedef uint32_t Elf32_Addr;$/;"	t
+Elf32_Ehdr	elf.h	/^} Elf32_Ehdr;$/;"	t	typeref:struct:__anon1
+Elf32_Half	elf.h	/^typedef uint16_t Elf32_Half;$/;"	t
+Elf32_Off	elf.h	/^typedef uint32_t Elf32_Off;$/;"	t
+Elf32_Phdr	elf.h	/^} Elf32_Phdr;$/;"	t	typeref:struct:__anon3
+Elf32_Section	elf.h	/^typedef uint16_t Elf32_Section;$/;"	t
+Elf32_Shdr	elf.h	/^} Elf32_Shdr;$/;"	t	typeref:struct:__anon2
+Elf32_Sword	elf.h	/^typedef int32_t Elf32_Sword;$/;"	t
+Elf32_Sxword	elf.h	/^typedef int64_t Elf32_Sxword;$/;"	t
+Elf32_Symndx	elf.h	/^typedef uint32_t Elf32_Symndx;$/;"	t
+Elf32_Word	elf.h	/^typedef uint32_t Elf32_Word;$/;"	t
+Elf32_Xword	elf.h	/^typedef uint64_t Elf32_Xword;$/;"	t
+PF_MASKPROC	elf.h	141;"	d
+PF_R	elf.h	140;"	d
+PF_W	elf.h	139;"	d
+PF_X	elf.h	138;"	d
+PT_DYNAMIC	elf.h	125;"	d
+PT_HIOS	elf.h	132;"	d
+PT_HIPROC	elf.h	134;"	d
+PT_INTERP	elf.h	126;"	d
+PT_LOAD	elf.h	124;"	d
+PT_LOOS	elf.h	131;"	d
+PT_LOPROC	elf.h	133;"	d
+PT_NOTE	elf.h	127;"	d
+PT_NULL	elf.h	123;"	d
+PT_NUM	elf.h	130;"	d
+PT_PHDR	elf.h	129;"	d
+PT_SHLIB	elf.h	128;"	d
+_ELF_H	elf.h	22;"	d
+e_ehsize	elf.h	/^	Elf32_Half e_ehsize;		  \/* ELF header size in bytes *\/$/;"	m	struct:__anon1
+e_entry	elf.h	/^	Elf32_Addr e_entry;		  \/* Entry point virtual address *\/$/;"	m	struct:__anon1
+e_flags	elf.h	/^	Elf32_Word e_flags;		  \/* Processor-specific flags *\/$/;"	m	struct:__anon1
+e_ident	elf.h	/^	unsigned char e_ident[EI_NIDENT]; \/* Magic number and other info *\/$/;"	m	struct:__anon1
+e_machine	elf.h	/^	Elf32_Half e_machine;		  \/* Architecture *\/$/;"	m	struct:__anon1
+e_phentsize	elf.h	/^	Elf32_Half e_phentsize;		  \/* Program header table entry size *\/$/;"	m	struct:__anon1
+e_phnum	elf.h	/^	Elf32_Half e_phnum;		  \/* Program header table entry count *\/$/;"	m	struct:__anon1
+e_phoff	elf.h	/^	Elf32_Off e_phoff;		  \/* Program header table file offset *\/$/;"	m	struct:__anon1
+e_shentsize	elf.h	/^	Elf32_Half e_shentsize;		  \/* Section header table entry size *\/$/;"	m	struct:__anon1
+e_shnum	elf.h	/^	Elf32_Half e_shnum;		  \/* Section header table entry count *\/$/;"	m	struct:__anon1
+e_shoff	elf.h	/^	Elf32_Off e_shoff;		  \/* Section header table file offset *\/$/;"	m	struct:__anon1
+e_shstrndx	elf.h	/^	Elf32_Half e_shstrndx;		  \/* Section header string table index *\/$/;"	m	struct:__anon1
+e_type	elf.h	/^	Elf32_Half e_type;		  \/* Object file type *\/$/;"	m	struct:__anon1
+e_version	elf.h	/^	Elf32_Word e_version;		  \/* Object file version *\/$/;"	m	struct:__anon1
+is_elf_format	readelf.c	/^int is_elf_format(const void *binary, size_t size) {$/;"	f
+main	hello.c	/^int main() {$/;"	f
+main	main.c	/^int main(int argc, char *argv[]) {$/;"	f
+p_align	elf.h	/^	Elf32_Word p_align;  \/* Segment alignment *\/$/;"	m	struct:__anon3
+p_filesz	elf.h	/^	Elf32_Word p_filesz; \/* Segment size in file *\/$/;"	m	struct:__anon3
+p_flags	elf.h	/^	Elf32_Word p_flags;  \/* Segment flags *\/$/;"	m	struct:__anon3
+p_memsz	elf.h	/^	Elf32_Word p_memsz;  \/* Segment size in memory *\/$/;"	m	struct:__anon3
+p_offset	elf.h	/^	Elf32_Off p_offset;  \/* Segment file offset *\/$/;"	m	struct:__anon3
+p_paddr	elf.h	/^	Elf32_Addr p_paddr;  \/* Segment physical address *\/$/;"	m	struct:__anon3
+p_type	elf.h	/^	Elf32_Word p_type;   \/* Segment type *\/$/;"	m	struct:__anon3
+p_vaddr	elf.h	/^	Elf32_Addr p_vaddr;  \/* Segment virtual address *\/$/;"	m	struct:__anon3
+readelf	readelf.c	/^int readelf(const void *binary, size_t size) {$/;"	f
+sh_addr	elf.h	/^	Elf32_Addr sh_addr;	 \/* Section addr *\/$/;"	m	struct:__anon2
+sh_addralign	elf.h	/^	Elf32_Word sh_addralign; \/* Section alignment *\/$/;"	m	struct:__anon2
+sh_entsize	elf.h	/^	Elf32_Word sh_entsize;	 \/* Section entry size *\/$/;"	m	struct:__anon2
+sh_flags	elf.h	/^	Elf32_Word sh_flags;	 \/* Section flags *\/$/;"	m	struct:__anon2
+sh_info	elf.h	/^	Elf32_Word sh_info;	 \/* Section extra info *\/$/;"	m	struct:__anon2
+sh_link	elf.h	/^	Elf32_Word sh_link;	 \/* Section link *\/$/;"	m	struct:__anon2
+sh_name	elf.h	/^	Elf32_Word sh_name;	 \/* Section name *\/$/;"	m	struct:__anon2
+sh_offset	elf.h	/^	Elf32_Off sh_offset;	 \/* Section offset *\/$/;"	m	struct:__anon2
+sh_size	elf.h	/^	Elf32_Word sh_size;	 \/* Section size *\/$/;"	m	struct:__anon2
+sh_type	elf.h	/^	Elf32_Word sh_type;	 \/* Section type *\/$/;"	m	struct:__anon2
