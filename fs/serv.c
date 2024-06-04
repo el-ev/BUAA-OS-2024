@@ -164,6 +164,15 @@ void serve_open(u_int envid, struct Fsreq_open *rq) {
 		return;
 	}
 
+	if (
+		((rq->req_omode == O_RDONLY) && ! (f->f_mode & FMODE_R))		
+	||	((rq->req_omode == O_WRONLY) && ! (f->f_mode & FMODE_W))
+	||	((rq->req_omode == O_RDWR  ) && (! (f->f_mode & FMODE_R) ||  ! (f->f_mode & FMODE_W)) )	
+	) {
+		ipc_send(envid, -E_PERM_DENY , 0, 0);
+		return;
+	}
+
 	// Save the file pointer.
 	o->o_file = f;
 
@@ -334,6 +343,31 @@ void serve_sync(u_int envid) {
 	ipc_send(envid, 0, 0, 0);
 }
 
+void serve_chmod(u_int envid, struct Fsreq_chmod *rq) {
+	int r;
+	struct File *f;
+	
+	if ((r = file_open(rq->req_path, &f)) <0) {
+		ipc_send(envid, r, 0, 0);
+		return;
+	}
+	switch (rq->req_type) {
+		case 0:
+			f->f_mode = rq->req_mode;
+			break;
+		case 1:
+			f->f_mode |= rq->req_mode;
+			break;
+		case 2:
+			f->f_mode &= ~rq->req_mode;
+			break;
+		default:
+			break;
+	}
+	ipc_send(envid, 0, 0, 0);
+
+}
+
 /*
  * The serve function table
  * File system use this table and the request number to
@@ -342,7 +376,7 @@ void serve_sync(u_int envid) {
 void *serve_table[MAX_FSREQNO] = {
     [FSREQ_OPEN] = serve_open,	 [FSREQ_MAP] = serve_map,     [FSREQ_SET_SIZE] = serve_set_size,
     [FSREQ_CLOSE] = serve_close, [FSREQ_DIRTY] = serve_dirty, [FSREQ_REMOVE] = serve_remove,
-    [FSREQ_SYNC] = serve_sync,
+    [FSREQ_SYNC] = serve_sync,   [FSREQ_CHMOD] = serve_chmod,
 };
 
 /*
