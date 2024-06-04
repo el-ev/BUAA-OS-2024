@@ -21,6 +21,7 @@ struct Page_list page_free_list; /* Free list of physical pages */
  *   Use '_memsize' from bootloader to initialize 'memsize' and
  *   calculate the corresponding 'npage' value.
  */
+
 void mips_detect_memory(u_int _memsize)
 {
     /* Step 1: Initialize memsize. */
