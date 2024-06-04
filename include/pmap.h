@@ -26,7 +26,7 @@ extern struct Page *pages;
 extern struct Page_list page_free_list;
 
 static inline u_long page2ppn(struct Page *pp) {
-	return pp - pages;
+    return pp - pages;
 }
 
 static inline u_long page2pa(struct Page *pp) {
