@@ -470,7 +470,7 @@ void env_run(struct Env *e) {
 	/* Step 3: Change 'cur_pgdir' to 'curenv->env_pgdir', switching to its address space. */
 	/* Exercise 3.8: Your code here. (1/2) */
 	cur_pgdir = curenv->env_pgdir;
-
+	
 	/* Step 4: Use 'env_pop_tf' to restore the curenv's saved context (registers) and return/go
 	 * to user mode.
 	 *
@@ -567,4 +567,11 @@ void envid2env_check() {
 	re = envid2env(pe2->env_id, &pe, 1);
 	assert(re == -E_BAD_ENV);
 	printk("envid2env() work well!\n");
+}
+
+void env_stat(struct Env *e, u_int *pri, u_int *scheds, u_int *runs, u_int *clocks) {
+    *pri = e->env_pri;
+    *scheds = e->env_scheds;
+    *runs = e->env_runs;
+    *clocks = e->env_clocks;
 }
