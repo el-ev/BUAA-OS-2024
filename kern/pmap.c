@@ -289,6 +289,21 @@ struct Page* page_lookup(Pde* pgdir, u_long va, Pte** ppte)
 }
 /* End of Key Code "page_lookup" */
 
+u_int page_filter(Pde *pgdir, u_int va_lower_limit, u_int va_upper_limit, u_int num) {
+    u_int ret = 0;
+    for (u_int va = va_lower_limit; va < va_upper_limit; va += PAGE_SIZE) {
+	Pte* pte;
+        struct Page* pp;
+	pgdir_walk(pgdir, va, 0, &pte);
+	if (!pte) continue;
+	if (*pte & PTE_V) {
+	    pp = pa2page(*pte);
+	    ret += (pp->pp_ref>=num);
+	}
+    }
+    return ret;
+}
+
 /* Overview:
  *   Decrease the 'pp_ref' value of Page 'pp'.
  *   When there's no references (mapped virtual address) to this page, release it.
