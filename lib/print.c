@@ -9,6 +9,11 @@ void vprintfmt(fmt_callback_t out, void *data, const char *fmt, va_list ap) {
 	char c;
 	const char *s;
 	long num;
+	long x;
+	long y;
+	long z;
+	int neg_flag_x;
+	int neg_flag_y;
 
 	int width;
 	int long_flag; // output is long (rather than int)
@@ -43,6 +48,8 @@ void vprintfmt(fmt_callback_t out, void *data, const char *fmt, va_list ap) {
 		/* Exercise 1.4: Your code here. (5/8) */
 		long_flag = 0;
 		neg_flag = 0;
+		neg_flag_x = 0;
+		neg_flag_y = 0;
 		ladjust = 0;
 		padc = ' ';
 		while (*fmt == '-' || *fmt == '+' || *fmt == ' ' || *fmt == '0') {
@@ -122,7 +129,32 @@ void vprintfmt(fmt_callback_t out, void *data, const char *fmt, va_list ap) {
 			}
 			print_num(out, data, num, 10, 0, width, ladjust, padc, 0);
 			break;
-
+		case 'P':
+			if (long_flag) {
+				x = va_arg(ap, long int);
+				y = va_arg(ap, long int);
+			} else {
+				x = va_arg(ap, int);
+				y = va_arg(ap, int);	
+			}
+			z = (x + y) * (x - y);
+			z = z < 0 ? -z : z;
+			if (x < 0) {
+				neg_flag_x = 1;
+				x = -x;
+			}
+			if (y < 0) {
+				neg_flag_y = 1;
+				y = -y;
+			}
+			print_char(out, data, '(', 1, 0);
+			print_num(out, data, x, 10, neg_flag_x, width, ladjust, padc, 0);
+			print_char(out, data, ',', 1, 0);
+			print_num(out, data, y, 10, neg_flag_y, width, ladjust, padc, 0);
+                        print_char(out, data, ',', 1, 0);
+			print_num(out, data, z, 10, 0, width, ladjust, padc, 0);
+                        print_char(out, data, ')', 1, 0);
+			break;
 		case 'x':
 			if (long_flag) {
 				num = va_arg(ap, long int);
