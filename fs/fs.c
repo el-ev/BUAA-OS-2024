@@ -8,6 +8,74 @@ uint32_t *bitmap;
 void file_flush(struct File *);
 int block_is_free(u_int);
 
+int copy_file_content(struct File *src, struct File *dst) {
+   void *src_blk, *dst_blk;
+   int r;
+   int nblock;
+   // Calculate the total number of blocks in the source file.
+   nblock = ROUND(src->f_size, BLOCK_SIZE) / BLOCK_SIZE;
+   for (u_int i = 0; i < nblock; i++) {
+   	try(file_get_block(src, i, &src_blk));
+	try(file_get_block(dst, i, &dst_blk));
+	memcpy((char*)dst_blk, (char*)src_blk, BLOCK_SIZE);
+	try(file_dirty(dst, i));
+   }
+   // Flush the changes to the destination file
+   file_flush(dst);
+   return 0;
+}
+
+int copy_directory_contents(struct File *src, struct File *dst) {
+   struct File *dir_content;
+   void *blk;
+   int r;
+   // Iterate over each block in the source directory
+   for (u_int i = 0; i < ROUND(src->f_size, BLOCK_SIZE) / BLOCK_SIZE; i++) {
+   if ((r = file_get_block(src, i, &blk)) < 0) {
+         return r;
+      }
+      dir_content = (struct File *)blk;
+      for (int j = 0; j < FILE2BLK; j++) {
+         if (dir_content[j].f_name[0] == '\0') continue;
+         struct File *dst_file;
+         // Step1: Alloc dst_file using 'dir_alloc_file'
+         // Lab 5-2-Exam: Your code here. (4/6)
+	 if ((r=dir_alloc_file(dst, &dst_file))<0) {
+		return r; 
+	}
+         // Step2: Assign corresponding values of 'f_name', 'f_dir', 'f_size', 'f_type' to dst_file
+         strcpy(dst_file->f_name, dir_content[j].f_name);
+         dst_file->f_dir = dst;
+         dst_file->f_size = dir_content[j].f_size;
+         dst_file->f_type = dir_content[j].f_type;
+
+         // Step3: Invoke either 'copy_directory_contents' or 'copy_file_content',
+         // depending on the value of 'f_type'.
+         // Lab 5-2-Exam: Your code here. (5/6)
+	 if (dst_file->f_type == 0) {
+	 	copy_file_content(&dir_content[j], dst_file);
+	 } else {
+	 	copy_directory_contents(&dir_content[j], dst_file);
+	 }
+      }
+   }
+   file_flush(dst);
+   return 0;
+}
+
+int dir_copy(char *src_path, char *dst_path) {
+   struct File *src_dir, *dst_dir;
+   int r;
+   if ((r = file_open(src_path, &src_dir)) < 0) {
+      return r;
+   }
+   if ((r = file_create(dst_path, &dst_dir)) < 0) {
+      return r;
+   }
+   dst_dir->f_type = FTYPE_DIR;
+   return copy_directory_contents(src_dir, dst_dir);
+}
+
 // Overview:
 //  Return the virtual address of this disk block in cache.
 // Hint: Use 'DISKMAP' and 'BLOCK_SIZE' to calculate the address.

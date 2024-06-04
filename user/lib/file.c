@@ -19,6 +19,12 @@ struct Dev devfile = {
     .dev_stat = file_stat,
 };
 
+
+int copy(const char *src_path, const char *dst_path){
+	fsipc_copy(src_path, dst_path);
+}
+
+
 // Overview:
 //  Open a file (or directory).
 //
