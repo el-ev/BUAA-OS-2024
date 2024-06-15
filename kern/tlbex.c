@@ -1,6 +1,7 @@
 #include <bitops.h>
 #include <env.h>
 #include <pmap.h>
+#include <sched.h>
 
 /* Lab 2 Key Code "tlb_invalidate" */
 /* Overview:
@@ -19,7 +20,9 @@ static void passive_alloc(u_int va, Pde *pgdir, u_int asid) {
 	struct Page *p = NULL;
 
 	if (va < UTEMP) {
-		panic("address too low");
+		curenv->env_signal |= 1 << (11 - 1); // SIGSEGV
+		schedule(-1);
+		return;
 	}
 
 	if (va >= USTACKTOP && va < USTACKTOP + PAGE_SIZE) {

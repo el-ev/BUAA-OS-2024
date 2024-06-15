@@ -6,6 +6,7 @@
 #include <mmu.h>
 #include <pmap.h>
 #include <syscall.h>
+#include <signal.h>
 #include <trap.h>
 
 #define vpt ((const volatile Pte *)UVPT)
@@ -68,9 +69,13 @@ int syscall_ipc_recv(void *dstva);
 int syscall_cgetc(void);
 int syscall_write_dev(void *va, u_int dev, u_int len);
 int syscall_read_dev(void *va, u_int dev, u_int len);
+int syscall_set_signal_handler(u_int envid, u_int handler);
+int syscall_signal_add(u_int envid, int signum);
+int syscall_signal_del(u_int envid, int signum);
+int syscall_signal_mask_set(u_int envid, u_int mask);
 
 // ipc.c
-void ipc_send(u_int whom, u_int val, const void *srcva, u_int perm);
+void ipc_send(u_int whom, u_int val, const void* srcva, u_int perm);
 u_int ipc_recv(u_int *whom, void *dstva, u_int *perm);
 
 // wait.c

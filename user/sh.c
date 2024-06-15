@@ -71,6 +71,7 @@ int parsecmd(char **argv, int *rightpipe) {
 		char *t;
 		int fd, r;
 		int c = gettoken(0, &t);
+		int child;
 		switch (c) {
 		case 0:
 			return argc;
@@ -153,7 +154,7 @@ int parsecmd(char **argv, int *rightpipe) {
 				exit();
 			}
 
-			int child = fork();
+			child = fork();
 			*rightpipe = child;
 			if (child < 0) {
 				debugf("fork failed: %d\n", child);
@@ -167,6 +168,18 @@ int parsecmd(char **argv, int *rightpipe) {
 				dup(p[1], 1);
 				close(p[1]);
 				close(p[0]);
+				return argc;
+			}
+			break;
+		case ';':
+			child = fork();
+			*rightpipe = 0;
+			if (child < 0) {
+				debugf("fork failed: %d\n", child);
+				exit();
+			} else if (child == 0) {
+				return parsecmd(argv, rightpipe);
+			} else {
 				return argc;
 			}
 			break;
@@ -186,6 +199,7 @@ void runcmd(char *s) {
 		return;
 	}
 	argv[argc] = 0;
+	debugf("env: %08x, argc: %d, argv: %08x, rightpipe: %d\n", env, argc, argv, rightpipe);
 
 	int child = spawn(argv[0], argv);
 	close_all();

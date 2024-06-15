@@ -75,3 +75,19 @@ int syscall_read_dev(void *va, u_int dev, u_int size) {
 	/* Exercise 5.2: Your code here. (2/2) */
 	return msyscall(SYS_read_dev, va, dev, size);
 }
+
+int syscall_set_signal_handler(u_int envid, u_int handler) {
+	return msyscall(SYS_set_signal_handler, envid, handler);
+}
+
+int syscall_signal_add(u_int envid, int signum) {
+	return msyscall(SYS_signal_add, envid, signum);
+}
+
+int syscall_signal_del(u_int envid, int signum) {
+	return msyscall(SYS_signal_del, envid, signum);
+}
+
+int syscall_signal_mask_set(u_int envid, u_int mask) {
+	return msyscall(SYS_signal_mask_set, envid, mask);
+}

@@ -370,6 +370,9 @@ struct Env *env_create(const void *binary, size_t size, int priority) {
 	/* Exercise 3.7: Your code here. (2/3) */
 	e->env_pri = priority;
 	e->env_status = ENV_RUNNABLE;
+	e->env_signal = 0;
+	e->env_signal_mask = 0;
+	e->env_signal_handler_entry = 0;
 	/* Step 3: Use 'load_icode' to load the image from 'binary', and insert 'e' into
 	 * 'env_sched_list' using 'TAILQ_INSERT_HEAD'. */
 	/* Exercise 3.7: Your code here. (3/3) */
@@ -387,6 +390,12 @@ void env_free(struct Env *e) {
 
 	/* Hint: Note the environment's demise.*/
 	printk("[%08x] free env %08x\n", curenv ? curenv->env_id : 0, e->env_id);
+
+	if (e->env_parent_id) {
+		struct Env *parent;
+		envid2env(e->env_parent_id, &parent, 0);
+		parent->env_signal |= 1 << (17 - 1); // SIGCHLD
+	}
 
 	/* Hint: Flush all mapped pages in the user portion of the address space */
 	for (pdeno = 0; pdeno < PDX(UTOP); pdeno++) {
@@ -418,6 +427,7 @@ void env_free(struct Env *e) {
 	tlb_invalidate(e->env_asid, UVPT + (PDX(UVPT) << PGSHIFT));
 	/* Hint: return the environment to the free list. */
 	e->env_status = ENV_FREE;
+
 	LIST_INSERT_HEAD((&env_free_list), (e), env_link);
 	TAILQ_REMOVE(&env_sched_list, (e), env_sched_link);
 }
@@ -478,6 +488,14 @@ void env_run(struct Env *e) {
 	/* Step 3: Change 'cur_pgdir' to 'curenv->env_pgdir', switching to its address space. */
 	/* Exercise 3.8: Your code here. (1/2) */
 	cur_pgdir = curenv->env_pgdir;
+
+	if (curenv->env_signal & ~(curenv->env_signal_mask)) {
+		if (curenv->env_signal_handler_entry == 0) {
+			panic("env_run: env_signal_handler_entry is 0\n");
+		}
+		curenv->env_tf.regs[25] = curenv->env_tf.cp0_epc;
+		curenv->env_tf.cp0_epc = curenv->env_signal_handler_entry;
+	}
 
 	/* Step 4: Use 'env_pop_tf' to restore the curenv's saved context (registers) and return/go
 	 * to user mode.

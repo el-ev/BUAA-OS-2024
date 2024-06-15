@@ -107,7 +107,6 @@ int read_block(u_int blockno, void **blk, u_int *isnew) {
 
 	// Step 3: transform block number to corresponding virtual address.
 	void *va = disk_addr(blockno);
-
 	// Step 4: read disk and set *isnew.
 	// Hint:
 	//  If this block is already mapped, just set *isnew, else alloc memory and
@@ -146,6 +145,7 @@ int map_block(u_int blockno) {
 	// Hint: Use 'disk_addr' for the virtual address.
 	/* Exercise 5.7: Your code here. (2/5) */
     try(syscall_mem_alloc(0, disk_addr(blockno), PTE_D));
+	
     return 0;
 }
 

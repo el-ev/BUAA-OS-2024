@@ -276,6 +276,9 @@ int sys_exofork(void) {
 	/* Exercise 4.9: Your code here. (4/4) */
 	e->env_status = ENV_NOT_RUNNABLE;
 	e->env_pri = curenv->env_pri;
+	e->env_signal_handler_entry = curenv->env_signal_handler_entry;
+	e->env_signal_mask = curenv->env_signal_mask;
+	e->env_signal = 0;
 
 	return e->env_id;
 }
@@ -560,6 +563,58 @@ int sys_read_dev(u_int va, u_int pa, u_int len) {
 	return 0;
 }
 
+int sys_set_signal_handler(u_int envid, u_int handler) {
+	struct Env *env;
+	if (envid2env(envid, &env, 1)) {
+		return -E_BAD_ENV;
+	}
+	env->env_signal_handler_entry = handler;
+	return 0;
+}
+
+int sys_signal_add(u_int envid, int signum) {
+	struct Env *env;
+
+	if (envid2env(envid, &env, 0)) {
+		return -E_BAD_ENV;
+	}
+
+	if (signum < 0 || signum >= 32) {
+		return -E_INVAL;
+	}
+
+	env->env_signal |= (1 << (signum - 1));
+	
+	return 0;
+}
+
+int sys_signal_del(u_int envid, int signum) {
+	struct Env *env;
+
+	if (envid2env(envid, &env, 1)) {
+		return -E_BAD_ENV;
+	}
+
+	if (signum < 0 || signum >= 32) {
+		return -E_INVAL;
+	}
+
+	env->env_signal &= ~(1 << (signum - 1));
+	return 0;
+}
+
+int sys_signal_mask_set(u_int envid, int mask) {
+	struct Env *env;
+
+	if (envid2env(envid, &env, 1)) {
+		return -E_BAD_ENV;
+	}
+
+	mask &= ~(1 << (9 - 1)); // ignore SIGKILL
+	env->env_signal_mask = mask;
+	return 0;
+}
+
 void *syscall_table[MAX_SYSNO] = {
     [SYS_putchar] = sys_putchar,
     [SYS_print_cons] = sys_print_cons,
@@ -579,6 +634,10 @@ void *syscall_table[MAX_SYSNO] = {
     [SYS_cgetc] = sys_cgetc,
     [SYS_write_dev] = sys_write_dev,
     [SYS_read_dev] = sys_read_dev,
+	[SYS_set_signal_handler] = sys_set_signal_handler,
+	[SYS_signal_add] = sys_signal_add,
+	[SYS_signal_del] = sys_signal_del,
+	[SYS_signal_mask_set] = sys_signal_mask_set,
 };
 
 /* Overview:
@@ -594,14 +653,16 @@ void *syscall_table[MAX_SYSNO] = {
 void do_syscall(struct Trapframe *tf) {
 	int (*func)(u_int, u_int, u_int, u_int, u_int);
 	int sysno = tf->regs[4];
-	if (sysno < 0 || sysno >= MAX_SYSNO) {
-		tf->regs[2] = -E_NO_SYS;
-		return;
-	}
 
 	/* Step 1: Add the EPC in 'tf' by a word (size of an instruction). */
 	/* Exercise 4.2: Your code here. (1/4) */
 	tf->cp0_epc += sizeof(u_int);
+
+	if (sysno < 0 || sysno >= MAX_SYSNO) {
+		tf->regs[2] = -E_NO_SYS;
+		curenv->env_signal |= 1 << (31 - 1); // SIGSYS
+		schedule(-1);
+	}
 
 	/* Step 2: Use 'sysno' to get 'func' from 'syscall_table'. */
 	/* Exercise 4.2: Your code here. (2/4) */
@@ -623,4 +684,8 @@ void do_syscall(struct Trapframe *tf) {
 	 */
 	/* Exercise 4.2: Your code here. (4/4) */
 	tf->regs[2] = func(arg1, arg2, arg3, arg4, arg5);
+
+	if (curenv->env_signal & ~(curenv->env_signal_mask)) {
+		schedule(-1);
+	}
 }
